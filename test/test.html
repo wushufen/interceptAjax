@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="../src/index.js"></script>
+  </head>
+  <body>
+    <form>
+      <fieldset>
+        <label>
+          <input type="radio" name="radio" onclick="url='#url'" checked />
+          url=#url
+        </label>
+        <label>
+          <input type="radio" name="radio" onclick="url='./404'" />
+          url=./404
+        </label>
+        <label>
+          <input type="radio" name="radio" onclick="url='error://url'" />
+          url=error://url
+        </label>
+      </fieldset>
+      <fieldset>
+        <button type="button" onclick="window.type='xhr'; run()">xhr</button>
+        <button type="button" onclick="window.type='fetch'; run()">
+          fetch
+        </button>
+      </fieldset>
+    </form>
+
+    <script>
+      // interceptAjax = Function()
+
+      function test(label, fn) {
+        test.label = label
+        setTimeout(() => {
+          console.groupEnd()
+          console.log('')
+          console.group(label)
+          fn()
+          test.i--
+        }, test.i++ * 800)
+      }
+      test.i = 0
+
+      // xhr
+      function sendXhr(url = '#xhr') {
+        const xhr = new XMLHttpRequest()
+        xhr.open('post', url, true)
+        xhr.setRequestHeader('k', 'v')
+        xhr.onreadystatechange = (e) => {
+          if (xhr.readyState !== 4) return
+          console.log('onreadystatechange', e)
+          console.log(
+            '  ',
+            String(xhr.response).replace(/\s+/g, ' ').slice(0, 20)
+          )
+        }
+        xhr.onload = (e) => {
+          console.log(
+            '⚓【res】onload',
+            String(xhr.response).replace(/\s+/g, ' ').slice(0, 20)
+          )
+        }
+        xhr.onerror = (e) => {
+          console.warn('onerror', e)
+        }
+        xhr.onprogress = (e) => {
+          console.log('onprogress', e)
+        }
+        xhr.addEventListener('load', (e) => {
+          console.log('addEventListener load', e)
+        })
+        xhr.send('data')
+      }
+
+      // fetch
+      async function sendFetch(url = '#fetch') {
+        var promise = fetch(url, {
+          headers: { k: 'v' },
+          method: 'post',
+          body: 'data',
+        })
+        var response = await promise
+        // console.log('response:', response)
+        var text = await response.text()
+
+        console.log('⚓【res】', text.replace(/\s+/g, ' ').slice(0, 20))
+      }
+
+      function send(type, url) {
+        if (type === 'xhr') {
+          sendXhr(url)
+        }
+        if (type === 'fetch') {
+          sendFetch(url)
+        }
+      }
+    </script>
+    <script>
+      // config
+      url = '#api'
+      type = 'xhr'
+
+      function run() {
+        console.clear()
+
+        test(`${type}`, function () {
+          const off = interceptAjax({
+            before(request) {
+              console.log('🚀request', request)
+            },
+            after(request, response) {
+              off()
+              console.log('🌏response', response)
+            },
+          })
+
+          send(type, url)
+        })
+
+        test(`${type} before return`, function () {
+          const off = interceptAjax({
+            before(request) {
+              console.log('🚀request', request)
+              return '😈FAKE_DATA_BEFORE'
+            },
+            after(request, response) {
+              off()
+              console.log('🌏response', response)
+            },
+          })
+
+          send(type, url)
+        })
+
+        test(`${type} after return`, function () {
+          const off = interceptAjax({
+            before(request) {
+              console.log('🚀request', request)
+            },
+            after(request, response) {
+              off()
+              console.log('🌏response', response)
+              return '😈FAKE_DATA_AFTER'
+            },
+          })
+
+          send(type, url)
+        })
+      }
+    </script>
+  </body>
+</html>

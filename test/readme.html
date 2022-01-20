@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Document</title>
+    <script src="../src/index.js"></script>
+    <style>
+      script {
+        display: block;
+        white-space: pre;
+        font-size: 14px;
+      }
+    </style>
+  </head>
+  <body>
+    <script>
+      main()
+      async function main() {
+        // intercept
+        const off = interceptAjax(
+          function before(request) {
+            console.info('【request】', request.method, request.url)
+
+            // fake data
+            if (/fake/.test(request.url)) {
+              return 'FAKE_DATA_BEFORE'
+            }
+          },
+          function after(request, response) {
+            console.info('【response】', response)
+
+            // fake data
+            if (response.status == 404) {
+              return 'FAKE_DATA_AFTER'
+            }
+          }
+        )
+
+        // fetch
+        const res = await (await fetch('.?fake=true')).text()
+        console.log('res:', res) // => FAKE_DATA_BEFORE
+
+        // xhr
+        var xhr = new XMLHttpRequest()
+        xhr.open('get', '.?fake=true', true)
+        xhr.onload = (e) => {
+          console.log('res:', xhr.response) // => FAKE_DATA_BEFORE
+        }
+        xhr.send('data')
+      }
+    </script>
+  </body>
+</html>

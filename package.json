@@ -1,0 +1,37 @@
+{
+  "name": "intercept-ajax",
+  "version": "1.0.0",
+  "description": "intercept ajax",
+  "keywords": [
+    "intercept ajax",
+    "XMLHttpRequest",
+    "fetch",
+    "ajax",
+    "xhr",
+    "hook",
+    "mock",
+    "fake",
+    "faker",
+    "ajax hook",
+    "ajax mock",
+    "fetch hook",
+    "fetch mock"
+  ],
+  "main": "src/index.js",
+  "directories": {
+    "test": "test"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wushufen/interceptAjax.git"
+  },
+  "author": "wushufen",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wushufen/interceptAjax/issues"
+  },
+  "homepage": "https://github.com/wushufen/interceptAjax#readme"
+}
